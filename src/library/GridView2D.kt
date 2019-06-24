@@ -9,6 +9,6 @@ class GridView2D(
     private val neighbourhoods: Map<Neighbourhood2D, LocalNeighbourhood2D>
 ) {
     fun get(neighbourhood: Neighbourhood2D): LocalNeighbourhood2D {
-        return neighbourhoods[neighbourhood] ?: throw IllegalStateException("Unregistered neighbourhoods.")
+        return neighbourhoods[neighbourhood] ?: throw IllegalStateException("Unregistered neighbourhood.")
     }
 }

@@ -3,7 +3,6 @@ package example
 import library.*
 import java.awt.Color
 
-
 val ALIVE = State(Color.BLACK, ::aliveLogic)
 val DEAD = State(Color.WHITE, ::deadLogic)
 

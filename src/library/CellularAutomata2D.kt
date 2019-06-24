@@ -12,6 +12,8 @@ import kotlin.collections.HashMap
 class CellularAutomata2D(
     val width: Int,
     val height: Int,
+    val horizontalEdgeOption: EdgeOption = EdgeOption.WRAPPING,
+    val verticalEdgeOption: EdgeOption = EdgeOption.WRAPPING,
     val edgeState: State? = null,
     val cellSize: Int = 8,
     val tickdelay: Long = 200
@@ -48,7 +50,7 @@ class CellularAutomata2D(
         val g = panel.graphics as Graphics2D
 
         // Driver
-        Timer().scheduleAtFixedRate(object: TimerTask() {
+        Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
 
                 // Iterate over all cells, find their new state, and draw the new state
@@ -78,16 +80,18 @@ class CellularAutomata2D(
     private fun evaluateGridView(grid: Array<Array<State>>, x: Int, y: Int): GridView2D {
         val localNeighbours = HashMap<Neighbourhood2D, LocalNeighbourhood2D>()
         for (neighbourhood in neighbourhoods) {
-            localNeighbours.put(neighbourhood, LocalNeighbourhood2D(neighbourhood.relCoords.map {
-                (rx, ry) -> getState(grid, x + rx, y + ry)
-            }))
+            localNeighbours[neighbourhood] = LocalNeighbourhood2D(neighbourhood.relCoords.map { (rx, ry) ->
+                getState(grid, x + rx, y + ry)
+            })
         }
         return GridView2D(x, y, localNeighbours)
     }
 
     private fun getState(grid: Array<Array<State>>, x: Int, y: Int): State {
-        return grid[x wrap width][y wrap height] // TODO Edge options
+        if (horizontalEdgeOption == EdgeOption.FINITE && x !in 0..width) return edgeState!!
+        if (verticalEdgeOption == EdgeOption.FINITE && y !in 0..height) return edgeState!!
+        return grid[x wrap width][y wrap height]
     }
 
-    infix fun Int.wrap(divisor: Int) = (this % divisor).let { if (it < 0) it + divisor else it }
+    private infix fun Int.wrap(divisor: Int) = (this % divisor).let { if (it < 0) it + divisor else it }
 }
