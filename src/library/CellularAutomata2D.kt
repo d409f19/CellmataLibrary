@@ -6,6 +6,7 @@ import java.lang.IllegalStateException
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
+import kotlin.collections.HashMap
 
 
 class CellularAutomata2D(
@@ -13,10 +14,10 @@ class CellularAutomata2D(
     val height: Int,
     val edgeState: State? = null,
     val cellSize: Int = 8,
-    val tickdelay: Long = 250
+    val tickdelay: Long = 200
 ) {
     private val states: MutableList<State> = mutableListOf()
-    private val neighbourhoods: MutableList<Neighbourhood> = mutableListOf()
+    private val neighbourhoods: MutableList<Neighbourhood2D> = mutableListOf()
 
     init {
         if (width <= 0) throw IllegalArgumentException("Width must be positive.")
@@ -26,7 +27,7 @@ class CellularAutomata2D(
     }
 
     fun register(state: State) = states.add(state)
-    fun register(neighbourhood: Neighbourhood) = neighbourhoods.add(neighbourhood)
+    fun register(neighbourhood2D: Neighbourhood2D) = neighbourhoods.add(neighbourhood2D)
 
     fun start() {
 
@@ -55,7 +56,8 @@ class CellularAutomata2D(
                     for ((y, state) in row.withIndex()) {
 
                         val currentState = grid[x][y]
-                        val newState = (currentState.transitionLogic.call().takeIf { it is State } ?: state)
+                        val gridView = evaluateGridView(grid, x, y)
+                        val newState = (currentState.transitionLogic.call(gridView).takeIf { it is State } ?: state)
 
                         nextGrid[x][y] = newState
 
@@ -72,4 +74,20 @@ class CellularAutomata2D(
             }
         }, 0, tickdelay)
     }
+
+    private fun evaluateGridView(grid: Array<Array<State>>, x: Int, y: Int): GridView2D {
+        val localNeighbours = HashMap<Neighbourhood2D, LocalNeighbourhood2D>()
+        for (neighbourhood in neighbourhoods) {
+            localNeighbours.put(neighbourhood, LocalNeighbourhood2D(neighbourhood.relCoords.map {
+                (rx, ry) -> getState(grid, x + rx, y + ry)
+            }))
+        }
+        return GridView2D(x, y, localNeighbours)
+    }
+
+    private fun getState(grid: Array<Array<State>>, x: Int, y: Int): State {
+        return grid[x wrap width][y wrap height] // TODO Edge options
+    }
+
+    infix fun Int.wrap(divisor: Int) = (this % divisor).let { if (it < 0) it + divisor else it }
 }
