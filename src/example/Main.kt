@@ -1,8 +1,23 @@
 package example
 
-import dk.aau.cs.d409f19.cellumata.library.CellularAutomata2D
+import library.CellularAutomata2D
+import library.State
+import java.awt.Color
+
+val Alive = State(Color.BLACK, ::aliveLogic)
+val Dead = State(Color.WHITE, ::deadLogic)
+
+fun aliveLogic(): State {
+    return Dead
+}
+
+fun deadLogic(): State {
+    return Alive
+}
 
 fun main() {
-    println("Hello world!")
-    CellularAutomata2D(100, 100)
+    val ca = CellularAutomata2D(120, 80)
+    ca.register(Alive)
+    ca.register(Dead)
+    ca.start()
 }
