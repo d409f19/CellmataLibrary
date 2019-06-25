@@ -21,8 +21,10 @@ class Neighbourhood2D(val relCoords: List<Pair<Int, Int>>) {
     }
 }
 
-class LocalNeighbourhood2D(val neighbourStates: List<State>) {
+class LocalNeighbourhood2D(private val neighbourStates: List<State>) {
     fun count(state: State): Int {
         return neighbourStates.count { it == state }
     }
+
+    operator fun get(n: Int): State = neighbourStates[n]
 }

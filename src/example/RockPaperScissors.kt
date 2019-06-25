@@ -33,9 +33,5 @@ fun scissorsLogic(grid: GridView2D): State {
 
 fun main() {
     val ca = CellularAutomata2D(80, 80, tickdelay = 50)
-    ca.register(Neighbourhood2D.MOORE)
-    ca.register(ROCK)
-    ca.register(PAPER)
-    ca.register(SCISSORS)
-    ca.start()
+    ca.start(ROCK, PAPER, SCISSORS)
 }
